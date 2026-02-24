@@ -1027,7 +1027,7 @@ library.config_flags["wings_color"] = function(color)
 end
 
 -- ============================================
--- Self Hat (Chinese Neon Hat) - Fixed with cylinder
+-- Self Hat (Chinese Neon Hat) - Fixed with custom mesh
 -- ============================================
 local function destroyHat()
     if hat then
@@ -1047,7 +1047,7 @@ local function createHat()
     pcall(function()
         local hatPart = Instance.new("Part")
         hatPart.Name = "ChineseHat"
-        hatPart.Size = Vector3.new(2, 1.5, 2) -- taller to simulate hat height
+        hatPart.Size = Vector3.new(2, 2, 2) -- size of the part
         hatPart.Material = Enum.Material.Neon
         hatPart.Color = flags["hat_color"] and flags["hat_color"].Color or Color3.fromRGB(255,0,0)
         hatPart.Transparency = 0.1
@@ -1055,20 +1055,38 @@ local function createHat()
         hatPart.CanCollide = false
         hatPart.Parent = char
         
-        -- Use Cylinder mesh (closest approximation)
+        -- Use a custom cone mesh
         local mesh = Instance.new("SpecialMesh")
-        mesh.MeshType = Enum.MeshType.Cylinder
-        mesh.Scale = Vector3.new(1, 1.5, 1) -- make it taller
+        mesh.MeshId = "rbxassetid://20368050" -- cone mesh
+        mesh.TextureId = "" -- no texture
+        mesh.Scale = Vector3.new(2, 2, 2) -- scale to fit
         mesh.Parent = hatPart
         
         local weld = Instance.new("Weld")
         weld.Part0 = head
         weld.Part1 = hatPart
-        weld.C0 = CFrame.new(0, 1.2, 0) * CFrame.Angles(0, 0, 0)
+        weld.C0 = CFrame.new(0, 1.5, 0) * CFrame.Angles(0, 0, 0) -- position above head
         weld.Parent = hatPart
         
         hat = hatPart
     end)
+end
+
+lp.CharacterAdded:Connect(function()
+    task.wait(0.5)
+    if flags["hat_enabled"] then
+        createHat()
+    end
+end)
+
+library.config_flags["hat_enabled"] = function(v)
+    if v then createHat() else destroyHat() end
+end
+
+library.config_flags["hat_color"] = function(color)
+    if hat then
+        hat.Color = color
+    end
 end
 
 -- ============================================
